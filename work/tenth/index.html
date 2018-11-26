@@ -64,6 +64,39 @@
       //   // この中にデータ取得後の動きを記述していきます。
       // });
       //
+$(function(){
+    $('#js-search-button').on('click',function(){
+        var keyword = $('#js-search-word').val();
+
+        $.get('https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',{
+            applicationId: '1019399324990976605',
+            keyword: keyword,
+            booksGenreId: '001',
+            hits: '20'
+        },
+        function(data){
+            if (data.count > 0){
+                //全件削除
+                $("ul").empty();
+                $.each(data.Items,function(i,item){
+                //console.log(item);
+                    var list = $('<li class="lists__item">' + '<div class="lists__item__inner">' + '<a href="' +
+                        item.Item.itemUrl + '"class="lists__item__link" target="_blank">' + '<img src="' + item.Item
+                        .largeImageUrl + '" class="lists__item__img" alt="' + item.Item.title + '">' +
+                        '<p class="lists__item__detail">作品名：　' + item.Item.title + '</p>' +
+                        '<p class="lists__item__detail">作者　：　' + item.Item.author + '</p>' +
+                        '<p class="lists__item__detail">出版社：　' + item.Item.publisherName + '</p>' + '</a>' +
+                        '</div>' + '</li>');
+                    $('ul').append(list);
+                })
+            } else if (data.count === 0) {
+                $('.lists').before('<div class="coment"></div>')
+                coment = $('.coment');
+                coment.html('<p class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+            }
+        });
+    });
+});
     </script>
   </body>
 </html>
