@@ -64,7 +64,7 @@
       //   // この中にデータ取得後の動きを記述していきます。
       // });
       //
-$(function(){
+/*$(function(){
     $('#js-search-button').on('click',function(){
         var keyword = $('#js-search-word').val();
 
@@ -96,7 +96,111 @@ $(function(){
             }
         });
     });
-});
+});*/
+        
+/*$(function () {
+  var preword = '';
+  var page = 1;
+  $('#js-search-button').on('click', function () {
+    var searchword = $('#js-search-word').val();
+    if(searchword != preword){
+        $("ul").empty();  
+    }
+    if(searchword === preword){
+        page++;
+    }
+    // console.log(searchword);
+    $.ajax({
+      url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+      type: 'GET',
+      datatype: 'json',
+      data: {
+        keyword: searchword,
+        applicationId: '1019399324990976605',
+        booksGenreId: '001',
+        page: page,
+        hits: 20
+      }
+     //通信に成功した時
+    }).done(function (data) {
+       if (data.count > 0){
+       $.each(data.Items,function(i,item) {
+                    var list = $('<li class="lists__item">' + '<div class="lists__item__inner">' + '<a href="' +
+                        item.Item.itemUrl + '"class="lists__item__link" target="_blank">' + '<img src="' + item.Item
+                        .largeImageUrl + '" class="lists__item__img" alt="' + item.Item.title + '">' +
+                        '<p class="lists__item__detail">作品名：　' + item.Item.title + '</p>' +
+                        '<p class="lists__item__detail">作者　：　' + item.Item.author + '</p>' +
+                        '<p class="lists__item__detail">出版社：　' + item.Item.publisherName + '</p>' + '</a>' +
+                        '</div>' + '</li>');
+                    $('ul').prepend(list);
+                    preword = searchword;
+            })
+            } else if (data.count === 0) {
+                //$("ul").empty();
+                $('.lists').before('<div class="coment"></div>')
+                coment = $('.coment');
+                coment.html('<p class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+            }
+      })
+      //通信に失敗した時
+    }).fail(function (err) {
+      $('.lists').after('<div class="datacoment"></div>')
+      datacoment = $('.datacoment');
+      datacoment.html('<p class="message">データ通信できませんでした<br>接続を確認してください。</p>');
+    })
+  });*/
+        
+        
+  $(function() {
+    var preword = '';
+    var page = 1;
+    $('.search__btn').on('click', function() {
+        //console.log(preword);
+      var searchword = $('.search__text__input').val();
+     if(searchword === preword){
+         page++;
+     }else{
+        $('.lists').empty(); 
+         page = 1;
+         preword = searchword;
+     }
+      $.ajax({
+        url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+        type: 'GET',
+        datatype: 'json',
+        data: {
+          keyword: searchword,
+          applicationId: '1019399324990976605',
+          booksGenreId: '001',
+          page: page,
+          hits: 20
+        }
+      }).done(function(data) {
+        var template = '';
+        data.Items.forEach(function(item) {
+          template +=
+            '<li class="lists__item">' +
+              '<div class="lists__item__inner">' +
+                '<a href="'+ item.Item.itemUrl +'"class="lists__item__link" target="_blank">' +
+                  '<img src="'+ item.Item.mediumImageUrl +'" class="lists__item__img" alt="'+ item.Item.title +'">' +
+                    '<p class="lists__item__detail">作品名：'+ item.Item.title +'</p>' +
+                    '<p class="lists__item__detail">作者　：'+ item.Item.author +'</p>' +
+                    '<p class="lists__item__detail">出版社：'+ item.Item.publisherName +'</p>' +
+                '</a>' +
+              '</div>' +
+            '</li>';
+        })
+        $('.lists').prepend(template);
+         if(data.count === 0) {
+            $('.lists').empty(); 
+            $('.lists').html('<p class="message">検索結果が見つかりませんでした。<br>別のキーワードで検索してください</p>');
+        }
+      }).fail(function(err) {
+        $('.lists').empty(); 
+        $('.lists').html('<p class="message">データ通信ができませんでした<br>接続を確認してください。</p>');
+      });
+    });
+  });
     </script>
   </body>
 </html>
